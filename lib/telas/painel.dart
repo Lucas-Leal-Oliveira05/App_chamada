@@ -19,9 +19,8 @@ class _PainelStatusPageState extends State<PainelStatusPage> {
   @override
   void initState() {
     super.initState();
-
-    // Atualiza o painel periodicamente para refletir o estado das chamadas
-    _timer = Timer.periodic(const Duration(seconds: 20), (_) {
+    // Atualiza a tela automaticamente
+    _timer = Timer.periodic(const Duration(seconds: 10), (_) {
       setState(() {});
     });
   }
@@ -32,7 +31,6 @@ class _PainelStatusPageState extends State<PainelStatusPage> {
     super.dispose();
   }
 
-  // Retorna o status atual da chamada
   String _getStatus(DateTime horario) {
     final agora = DateTime.now();
     final inicio = horario;
@@ -43,7 +41,6 @@ class _PainelStatusPageState extends State<PainelStatusPage> {
     return 'Em andamento';
   }
 
-  // Cores de status
   Color _getCorStatus(String status) {
     switch (status) {
       case 'Em andamento':
@@ -60,10 +57,10 @@ class _PainelStatusPageState extends State<PainelStatusPage> {
     final horarios = widget.controller.horarios;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF6F6F6),
+      backgroundColor: const Color(0xFFF7F7F7),
       body: ListView.builder(
-        itemCount: horarios.length,
         padding: const EdgeInsets.all(16),
+        itemCount: horarios.length,
         itemBuilder: (context, index) {
           final horario = horarios[index];
           final status = _getStatus(horario);
@@ -72,7 +69,7 @@ class _PainelStatusPageState extends State<PainelStatusPage> {
           final emAndamento = status == 'Em andamento';
 
           return AnimatedContainer(
-            duration: const Duration(milliseconds: 400),
+            duration: const Duration(milliseconds: 300),
             curve: Curves.easeInOut,
             margin: const EdgeInsets.symmetric(vertical: 8),
             padding: const EdgeInsets.all(16),
@@ -81,16 +78,16 @@ class _PainelStatusPageState extends State<PainelStatusPage> {
               borderRadius: BorderRadius.circular(16),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black,
-                  blurRadius: 6,
-                  offset: const Offset(0, 3),
+                  color: Colors.black.withOpacity(0.08),
+                  blurRadius: 5,
+                  offset: const Offset(0, 2),
                 ),
               ],
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Linha principal (horário + status)
+                // Cabeçalho sempre visível
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -103,60 +100,69 @@ class _PainelStatusPageState extends State<PainelStatusPage> {
                     ),
                     Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 10, vertical: 6),
+                        horizontal: 10,
+                        vertical: 6,
+                      ),
                       decoration: BoxDecoration(
-                        color: cor,
+                        color: cor.withOpacity(0.15),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
                         status,
                         style: TextStyle(
                           color: cor,
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                     ),
                   ],
                 ),
 
-                // 🔹 Parte expandida (aparece somente durante a chamada)
-                if (emAndamento) ...[
-                  const SizedBox(height: 12),
-                  const Divider(),
-                  const SizedBox(height: 8),
-                  const Text(
-                    'A chamada está aberta! Os alunos podem registrar presença agora.',
-                    style: TextStyle(fontSize: 14),
-                  ),
-                  const SizedBox(height: 12),
-                  Center(
-                    child: ElevatedButton.icon(
-                      icon: const Icon(Icons.check_circle_outline),
-                      label: const Text(
-                        'Ir para Presença',
-                        style: TextStyle(fontSize: 16),
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.indigo,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 24, vertical: 12),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                // Expansão suave só durante a chamada
+                AnimatedCrossFade(
+                  duration: const Duration(milliseconds: 400),
+                  crossFadeState: emAndamento
+                      ? CrossFadeState.showSecond
+                      : CrossFadeState.showFirst,
+                  firstChild: const SizedBox.shrink(),
+                  secondChild: Padding(
+                    padding: const EdgeInsets.only(top: 16),
+                    child: Column(
+                      children: [
+                        const Text(
+                          'A chamada está aberta! Os alunos podem registrar presença agora.',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(fontSize: 14),
                         ),
-                      ),
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) =>
-                                PresencaPage(controller: widget.controller),
+                        const SizedBox(height: 12),
+                        ElevatedButton.icon(
+                          icon: const Icon(Icons.check_circle_outline),
+                          label: const Text('Ir para Presença'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.indigo,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 24,
+                              vertical: 12,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
                           ),
-                        );
-                      },
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) =>
+                                    PresencaPage(controller: widget.controller),
+                              ),
+                            );
+                          },
+                        ),
+                      ],
                     ),
                   ),
-                ],
+                ),
               ],
             ),
           );

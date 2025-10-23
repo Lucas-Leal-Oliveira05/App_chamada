@@ -4,7 +4,8 @@ import '../services/exporta.dart';
 
 class ChamadaController {
   final List<DateTime> horarios = [
-    DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day, 19, 0),
+    //DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day, 19, 0),
+    DateTime.now().add(const Duration(seconds: 10)), // daqui 10 segundos
     DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day, 19, 50),
     DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day, 20, 40),
     DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day, 21, 30),
