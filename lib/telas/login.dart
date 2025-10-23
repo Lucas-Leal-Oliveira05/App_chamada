@@ -17,7 +17,7 @@ class _LoginPageState extends State<LoginPage> {
   String? _errorMessage;
 
   // Credenciais simuladas
-  final String _usuarioCorreto = 'admin';
+  final String _usuarioCorreto = 'aluno';
   final String _senhaCorreta = '1234';
 
   void _fazerLogin() async {
