@@ -1,5 +1,6 @@
+import 'package:app_chamada/telas/home.dart';
 import 'package:flutter/material.dart';
-import '../main.dart';
+
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -36,8 +37,11 @@ class _LoginPageState extends State<LoginPage> {
       if (!mounted) return;
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (_) => const HomePage()),
+        MaterialPageRoute(
+          builder: (_) => HomePage(usuarioLogado: _userController.text),
+        ),
       );
+
     } else {
       setState(() {
         _loading = false;

@@ -6,8 +6,11 @@ import 'presenca.dart';
 
 class PainelStatusPage extends StatefulWidget {
   final ChamadaController controller;
+  final String usuarioLogado;
 
-  const PainelStatusPage({super.key, required this.controller});
+  const PainelStatusPage({super.key,
+                          required this.controller,
+                          required this.usuarioLogado,});
 
   @override
   State<PainelStatusPage> createState() => _PainelStatusPageState();
@@ -154,7 +157,8 @@ class _PainelStatusPageState extends State<PainelStatusPage> {
                               context,
                               MaterialPageRoute(
                                 builder: (_) =>
-                                    PresencaPage(controller: widget.controller),
+                                    PresencaPage(controller: widget.controller,
+                                                usuarioLogado: widget.usuarioLogado,),
                               ),
                             );
                           },
