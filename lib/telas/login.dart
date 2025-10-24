@@ -1,7 +1,6 @@
 import 'package:app_chamada/telas/home.dart';
 import 'package:flutter/material.dart';
 
-
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
@@ -17,9 +16,12 @@ class _LoginPageState extends State<LoginPage> {
   bool _loading = false;
   String? _errorMessage;
 
-  // Credenciais simuladas
-  final String _usuarioCorreto = 'aluno';
-  final String _senhaCorreta = '1234';
+  // Contas simuladas: usuário -> senha
+  final Map<String, String> _accounts = {
+    'aluno': '1234',
+    'maria': '1234',
+    'joao': '1234',
+  };
 
   void _fazerLogin() async {
     if (!_formKey.currentState!.validate()) return;
@@ -29,25 +31,34 @@ class _LoginPageState extends State<LoginPage> {
       _errorMessage = null;
     });
 
-    await Future.delayed(const Duration(seconds: 1)); // simula requisição
+    await Future.delayed(const Duration(milliseconds: 700)); // simula requisição
 
-    if (_userController.text == _usuarioCorreto &&
-        _passController.text == _senhaCorreta) {
-      // Login bem-sucedido → navega para HomePage
+    final username = _userController.text.trim();
+    final password = _passController.text;
+
+    // verifica se existe usuário e se a senha confere
+    if (_accounts.containsKey(username) && _accounts[username] == password) {
       if (!mounted) return;
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (_) => HomePage(usuarioLogado: _userController.text),
+          builder: (_) => HomePage(usuarioLogado: username),
         ),
       );
-
-    } else {
-      setState(() {
-        _loading = false;
-        _errorMessage = 'Usuário ou senha inválidos';
-      });
+      return;
     }
+
+    setState(() {
+      _loading = false;
+      _errorMessage = 'Usuário ou senha inválidos';
+    });
+  }
+
+  @override
+  void dispose() {
+    _userController.dispose();
+    _passController.dispose();
+    super.dispose();
   }
 
   @override
@@ -101,9 +112,7 @@ class _LoginPageState extends State<LoginPage> {
                         labelText: 'Senha',
                         border: const OutlineInputBorder(),
                         suffixIcon: IconButton(
-                          icon: Icon(_obscure
-                              ? Icons.visibility_off
-                              : Icons.visibility),
+                          icon: Icon(_obscure ? Icons.visibility_off : Icons.visibility),
                           onPressed: () => setState(() {
                             _obscure = !_obscure;
                           }),
@@ -112,7 +121,7 @@ class _LoginPageState extends State<LoginPage> {
                       validator: (value) =>
                           value == null || value.isEmpty ? 'Informe a senha' : null,
                     ),
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 12),
 
                     if (_errorMessage != null)
                       Text(
@@ -136,6 +145,32 @@ class _LoginPageState extends State<LoginPage> {
                               'Entrar',
                               style: TextStyle(fontSize: 18),
                             ),
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    // Informação útil para testes
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        const Text(
+                          'Contas de teste:',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(height: 6),
+                        Wrap(
+                          spacing: 8,
+                          runSpacing: 6,
+                          children: _accounts.keys
+                              .map((u) => Chip(label: Text(u)))
+                              .toList(),
+                        ),
+                        const SizedBox(height: 6),
+                        const Text(
+                          'Senha padrão para testes: veja o mapa de contas no código.',
+                          style: TextStyle(fontSize: 12, color: Colors.black54),
+                        ),
+                      ],
                     ),
                   ],
                 ),

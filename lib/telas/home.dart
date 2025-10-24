@@ -3,6 +3,7 @@ import '../controllers/controle_chamada.dart';
 import 'painel.dart';
 import 'historico.dart';
 import 'relatorio.dart';
+import 'login.dart'; // importa a tela de login
 
 class HomePage extends StatefulWidget {
   final String usuarioLogado;
@@ -17,6 +18,39 @@ class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
   final controller = ChamadaController();
 
+  void _logout() {
+    // Mostra um diálogo de confirmação
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Sair da conta'),
+        content: const Text('Tem certeza que deseja sair?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context), // fecha o diálogo
+            child: const Text('Cancelar'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context); // fecha o diálogo
+              // Substitui toda a pilha de navegação e volta para o login
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (_) => const LoginPage()),
+                (route) => false,
+              );
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.redAccent,
+              foregroundColor: Colors.white,
+            ),
+            child: const Text('Sair'),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final paginas = [
@@ -28,7 +62,22 @@ class _HomePageState extends State<HomePage> {
       ExportPage(controller: controller),
     ];
 
+    final titulos = ['Painel', 'Histórico', 'Exportar'];
+
     return Scaffold(
+      appBar: AppBar(
+        title: Text('${titulos[_selectedIndex]} - ${widget.usuarioLogado}'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            tooltip: 'Sair da conta',
+            onPressed: _logout,
+          ),
+        ],
+        backgroundColor: Colors.indigo,
+        foregroundColor: Colors.white,
+        centerTitle: true,
+      ),
       body: paginas[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,

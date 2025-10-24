@@ -1,13 +1,13 @@
 class Chamada {
-  final DateTime horaInicio;
-  final DateTime horaFim;
+  DateTime horaInicio;
+  DateTime horaFim;
   bool aberta;
-  final List<String> presencas;
+  List<String> presencas;
 
   Chamada({
     required this.horaInicio,
     required this.horaFim,
     this.aberta = false,
-    this.presencas = const [],
-  });
+    List<String>? presencas,
+  }) : presencas = presencas ?? [];
 }

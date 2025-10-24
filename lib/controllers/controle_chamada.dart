@@ -1,11 +1,19 @@
 import 'dart:async';
+import 'package:flutter/foundation.dart';
 import '../models/chamada.dart';
 import '../services/exporta.dart';
 
-class ChamadaController {
+class ChamadaController extends ChangeNotifier { // ✅ agora é um ChangeNotifier
+  // 🔹 Singleton
+  static final ChamadaController _instancia = ChamadaController._interno();
+  factory ChamadaController() => _instancia;
+
+  ChamadaController._interno() {
+    _iniciarVerificacao();
+  }
+
   final List<DateTime> horarios = [
-    //DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day, 19, 0),
-    DateTime.now().add(const Duration(seconds: 10)), // daqui 10 segundos
+    DateTime.now().add(const Duration(seconds: 10)),
     DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day, 19, 50),
     DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day, 20, 40),
     DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day, 21, 30),
@@ -16,15 +24,11 @@ class ChamadaController {
 
   Timer? _timer;
   Chamada? chamadaAtual;
-
   final _exportService = ExportService();
 
-  ChamadaController() {
-    _iniciarVerificacao();
-  }
-
   void _iniciarVerificacao() {
-    _timer = Timer.periodic(const Duration(seconds: 30), (_) => _verificarChamadas());
+    _timer?.cancel();
+    _timer = Timer.periodic(const Duration(seconds: 5), (_) => _verificarChamadas());
   }
 
   void _verificarChamadas() {
@@ -39,6 +43,7 @@ class ChamadaController {
         return;
       }
     }
+
     if (chamadaAtual != null && chamadaAtual!.aberta) {
       final fim = chamadaAtual!.horaInicio.add(duracaoChamada);
       if (agora.isAfter(fim)) {
@@ -54,15 +59,18 @@ class ChamadaController {
       aberta: true,
     );
     historico.add(chamadaAtual!);
+    notifyListeners(); // ✅ avisa a interface
   }
 
   void _fecharChamada() {
     chamadaAtual!.aberta = false;
+    notifyListeners(); // ✅ atualiza interface
   }
 
   void registrarPresenca(String aluno) {
     if (chamadaAtual != null && chamadaAtual!.aberta) {
       chamadaAtual!.presencas.add(aluno);
+      notifyListeners(); // ✅ notifica quando alguém marca presença
     }
   }
 

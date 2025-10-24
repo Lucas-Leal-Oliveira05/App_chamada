@@ -5,22 +5,17 @@ class PresencaPage extends StatefulWidget {
   final ChamadaController controller;
   final String usuarioLogado;
 
-  const PresencaPage({super.key, required this.controller,
-                      required this.usuarioLogado,});
+  const PresencaPage({
+    super.key,
+    required this.controller,
+    required this.usuarioLogado,
+  });
 
   @override
   State<PresencaPage> createState() => _PresencaPageState();
 }
 
 class _PresencaPageState extends State<PresencaPage> {
-  final nomeController = TextEditingController();
-
-  @override
-  void dispose() {
-    nomeController.dispose();
-    super.dispose();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -33,34 +28,62 @@ class _PresencaPageState extends State<PresencaPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            TextField(
-              controller: nomeController,
-              decoration: const InputDecoration(
-                labelText: 'Seu nome',
-                border: OutlineInputBorder(),
+            Text(
+              'Usuário logado: ${widget.usuarioLogado}',
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 24),
             ElevatedButton.icon(
-              icon: const Icon(Icons.check),
+              icon: const Icon(Icons.check_circle_outline),
+              label: const Text('Registrar Presença'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.indigo,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 12,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
               onPressed: () {
-                final nome = nomeController.text.trim();
+                final chamada = widget.controller.chamadaAtual;
 
-                if (nome.isEmpty) {
+                // ✅ Verifica se há chamada aberta
+                if (chamada == null || !chamada.aberta) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Digite seu nome antes de registrar.')),
+                    const SnackBar(
+                      content: Text('Nenhuma chamada em andamento no momento.'),
+                    ),
                   );
                   return;
                 }
 
-                widget.controller.registrarPresenca(nome);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Presença registrada para $nome!')),
-                );
+                // ✅ Verifica se o aluno já registrou presença
+                if (chamada.presencas.contains(widget.usuarioLogado)) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Você já registrou presença nesta chamada.'),
+                    ),
+                  );
+                  return;
+                }
 
-                nomeController.clear();
+                // ✅ Registra presença do usuário logado
+                widget.controller.registrarPresenca(widget.usuarioLogado);
+
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      'Presença registrada para ${widget.usuarioLogado}!',
+                    ),
+                  ),
+                );
               },
-              label: const Text('Registrar Presença'),
             ),
           ],
         ),
