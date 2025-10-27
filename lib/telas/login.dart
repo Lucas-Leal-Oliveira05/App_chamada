@@ -1,5 +1,5 @@
-import 'package:app_chamada/telas/home.dart';
 import 'package:flutter/material.dart';
+import 'home.dart'; // certifique-se de que o caminho está correto
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -16,11 +16,11 @@ class _LoginPageState extends State<LoginPage> {
   bool _loading = false;
   String? _errorMessage;
 
-  // Contas simuladas: usuário -> senha
-  final Map<String, String> _accounts = {
-    'aluno': '1234',
-    'maria': '1234',
-    'joao': '1234',
+  // Contas simuladas: usuário -> { senha, tipo }
+  final Map<String, Map<String, String>> contas = {
+    'aluno': {'senha': '1234', 'tipo': 'aluno'},
+    'maria': {'senha': '1234', 'tipo': 'professor'},
+    'joao': {'senha': '1234', 'tipo': 'aluno'},
   };
 
   void _fazerLogin() async {
@@ -31,23 +31,31 @@ class _LoginPageState extends State<LoginPage> {
       _errorMessage = null;
     });
 
-    await Future.delayed(const Duration(milliseconds: 700)); // simula requisição
+    final usuario = _userController.text.trim();
+    final senha = _passController.text;
 
-    final username = _userController.text.trim();
-    final password = _passController.text;
+    // Verifica se o usuário existe
+    if (contas.containsKey(usuario)) {
+      final userData = contas[usuario]!; // Mapa com senha e tipo
+      if (userData['senha'] == senha) {
+        final tipo = userData['tipo']!; // "aluno" ou "professor"
 
-    // verifica se existe usuário e se a senha confere
-    if (_accounts.containsKey(username) && _accounts[username] == password) {
-      if (!mounted) return;
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (_) => HomePage(usuarioLogado: username),
-        ),
-      );
-      return;
+        if (!mounted) return;
+
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (_) => HomePage(
+              usuarioLogado: usuario,
+              tipo: tipo,
+            ),
+          ),
+        );
+        return;
+      }
     }
 
+    // Se chegou aqui, login falhou
     setState(() {
       _loading = false;
       _errorMessage = 'Usuário ou senha inválidos';
@@ -80,10 +88,9 @@ class _LoginPageState extends State<LoginPage> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(Icons.school, size: 64, color: Colors.indigo),
                     const SizedBox(height: 16),
                     const Text(
-                      'Login do Sistema de Chamada',
+                      'Login',
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
@@ -138,40 +145,14 @@ class _LoginPageState extends State<LoginPage> {
                         backgroundColor: Colors.indigo,
                       ),
                       child: _loading
-                          ? const CircularProgressIndicator(
-                              color: Colors.white,
-                            )
+                          ? const CircularProgressIndicator(color: Colors.white)
                           : const Text(
                               'Entrar',
-                              style: TextStyle(fontSize: 18),
+                              style: TextStyle(color: Colors.white, fontSize: 18),
                             ),
                     ),
 
                     const SizedBox(height: 16),
-
-                    // Informação útil para testes
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        const Text(
-                          'Contas de teste:',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        const SizedBox(height: 6),
-                        Wrap(
-                          spacing: 8,
-                          runSpacing: 6,
-                          children: _accounts.keys
-                              .map((u) => Chip(label: Text(u)))
-                              .toList(),
-                        ),
-                        const SizedBox(height: 6),
-                        const Text(
-                          'Senha padrão para testes: veja o mapa de contas no código.',
-                          style: TextStyle(fontSize: 12, color: Colors.black54),
-                        ),
-                      ],
-                    ),
                   ],
                 ),
               ),

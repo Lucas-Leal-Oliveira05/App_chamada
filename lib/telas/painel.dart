@@ -7,10 +7,14 @@ import 'presenca.dart';
 class PainelStatusPage extends StatefulWidget {
   final ChamadaController controller;
   final String usuarioLogado;
+  final bool professor; // ✅ tipo de conta (true = professor)
 
-  const PainelStatusPage({super.key,
-                          required this.controller,
-                          required this.usuarioLogado,});
+  const PainelStatusPage({
+    super.key,
+    required this.controller,
+    required this.usuarioLogado,
+    required this.professor,
+  });
 
   @override
   State<PainelStatusPage> createState() => _PainelStatusPageState();
@@ -22,7 +26,7 @@ class _PainelStatusPageState extends State<PainelStatusPage> {
   @override
   void initState() {
     super.initState();
-    // Atualiza a tela automaticamente
+    // Atualiza o painel automaticamente a cada 10s
     _timer = Timer.periodic(const Duration(seconds: 10), (_) {
       setState(() {});
     });
@@ -90,7 +94,7 @@ class _PainelStatusPageState extends State<PainelStatusPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Cabeçalho sempre visível
+                // Cabeçalho
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -121,7 +125,7 @@ class _PainelStatusPageState extends State<PainelStatusPage> {
                   ],
                 ),
 
-                // Expansão suave só durante a chamada
+                // Expansão suave quando a chamada está aberta
                 AnimatedCrossFade(
                   duration: const Duration(milliseconds: 400),
                   crossFadeState: emAndamento
@@ -133,36 +137,40 @@ class _PainelStatusPageState extends State<PainelStatusPage> {
                     child: Column(
                       children: [
                         const Text(
-                          'A chamada está aberta! Os alunos podem registrar presença agora.',
+                          'A chamada está aberta!',
                           textAlign: TextAlign.center,
                           style: TextStyle(fontSize: 14),
                         ),
                         const SizedBox(height: 12),
-                        ElevatedButton.icon(
-                          icon: const Icon(Icons.check_circle_outline),
-                          label: const Text('Ir para Presença'),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.indigo,
-                            foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 24,
-                              vertical: 12,
-                            ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) =>
-                                    PresencaPage(controller: widget.controller,
-                                                usuarioLogado: widget.usuarioLogado,),
+
+                        // ✅ Só exibe o botão se NÃO for professor
+                        if (!widget.professor)
+                          ElevatedButton.icon(
+                            icon: const Icon(Icons.how_to_reg),
+                            label: const Text('Ir para presença'),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.indigo,
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 32,
+                                vertical: 14,
                               ),
-                            );
-                          },
-                        ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => PresencaPage(
+                                    controller: widget.controller,
+                                    usuarioLogado: widget.usuarioLogado,
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
                       ],
                     ),
                   ),

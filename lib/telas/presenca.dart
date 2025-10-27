@@ -23,69 +23,72 @@ class _PresencaPageState extends State<PresencaPage> {
         title: const Text('Registrar Presença'),
         centerTitle: true,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              'Usuário logado: ${widget.usuarioLogado}',
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 24),
-            ElevatedButton.icon(
-              icon: const Icon(Icons.check_circle_outline),
-              label: const Text('Registrar Presença'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.indigo,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 24,
-                  vertical: 12,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-              onPressed: () {
-                final chamada = widget.controller.chamadaAtual;
-
-                // ✅ Verifica se há chamada aberta
-                if (chamada == null || !chamada.aberta) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Nenhuma chamada em andamento no momento.'),
-                    ),
-                  );
-                  return;
-                }
-
-                // ✅ Verifica se o aluno já registrou presença
-                if (chamada.presencas.contains(widget.usuarioLogado)) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Você já registrou presença nesta chamada.'),
-                    ),
-                  );
-                  return;
-                }
-
-                // ✅ Registra presença do usuário logado
-                widget.controller.registrarPresenca(widget.usuarioLogado);
-
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      'Presença registrada para ${widget.usuarioLogado}!',
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(32),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const SizedBox(height: 40),
+              SizedBox(
+                width: double.infinity, // ocupa toda a largura
+                height: 80, // aumenta a altura
+                child: ElevatedButton.icon(
+                  label: const Text(
+                    'Registrar Presença',
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
-                );
-              },
-            ),
-          ],
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.indigo,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    elevation: 6,
+                  ),
+                  onPressed: () {
+                    final chamada = widget.controller.chamadaAtual;
+
+                    // ✅ Verifica se há chamada aberta
+                    if (chamada == null || !chamada.aberta) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content:
+                              Text('Nenhuma chamada em andamento no momento.'),
+                        ),
+                      );
+                      return;
+                    }
+
+                    // ✅ Verifica se o aluno já registrou presença
+                    if (chamada.presencas.contains(widget.usuarioLogado)) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text(
+                              'Você já registrou presença nesta chamada.'),
+                        ),
+                      );
+                      return;
+                    }
+
+                    // ✅ Registra presença do usuário logado
+                    widget.controller.registrarPresenca(widget.usuarioLogado);
+
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          'Presença registrada para ${widget.usuarioLogado}!',
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

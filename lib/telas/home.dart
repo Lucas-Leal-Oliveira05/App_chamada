@@ -7,8 +7,13 @@ import 'login.dart'; // importa a tela de login
 
 class HomePage extends StatefulWidget {
   final String usuarioLogado;
+  final String tipo; // 'aluno' ou 'professor'
 
-  const HomePage({super.key, required this.usuarioLogado});
+  const HomePage({
+    super.key,
+    required this.usuarioLogado,
+    required this.tipo,
+  });
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -19,7 +24,6 @@ class _HomePageState extends State<HomePage> {
   final controller = ChamadaController();
 
   void _logout() {
-    // Mostra um diálogo de confirmação
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -27,13 +31,12 @@ class _HomePageState extends State<HomePage> {
         content: const Text('Tem certeza que deseja sair?'),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context), // fecha o diálogo
+            onPressed: () => Navigator.pop(context),
             child: const Text('Cancelar'),
           ),
           ElevatedButton(
             onPressed: () {
-              Navigator.pop(context); // fecha o diálogo
-              // Substitui toda a pilha de navegação e volta para o login
+              Navigator.pop(context);
               Navigator.pushAndRemoveUntil(
                 context,
                 MaterialPageRoute(builder: (_) => const LoginPage()),
@@ -53,20 +56,52 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final paginas = [
-      PainelStatusPage(
-        controller: controller,
-        usuarioLogado: widget.usuarioLogado,
-      ),
-      HistoricoPage(controller: controller),
-      ExportPage(controller: controller),
-    ];
+    // 🔹 Verifica se é professor
+    final bool isProfessor = widget.tipo == 'professor';
 
-    final titulos = ['Painel', 'Histórico', 'Exportar'];
+    // 🔹 Define páginas conforme o tipo
+    final paginas = isProfessor
+        ? [
+            HistoricoPage(controller: controller),
+            ExportPage(controller: controller),
+          ]
+        : [
+            PainelStatusPage(
+              controller: controller,
+              usuarioLogado: widget.usuarioLogado,
+              professor: false, // aluno
+            ),
+            HistoricoPage(controller: controller),
+            ExportPage(controller: controller),
+          ];
+
+    // 🔹 Define títulos e itens do menu
+    final titulos = isProfessor
+        ? ['Histórico', 'Exportar']
+        : ['Painel', 'Histórico', 'Exportar'];
+
+    final itens = isProfessor
+        ? const [
+            BottomNavigationBarItem(
+                icon: Icon(Icons.history), label: 'Histórico'),
+            BottomNavigationBarItem(
+                icon: Icon(Icons.file_download), label: 'Exportar'),
+          ]
+        : const [
+            BottomNavigationBarItem(
+                icon: Icon(Icons.dashboard), label: 'Painel'),
+            BottomNavigationBarItem(
+                icon: Icon(Icons.history), label: 'Histórico'),
+            BottomNavigationBarItem(
+                icon: Icon(Icons.file_download), label: 'Exportar'),
+          ];
+
+    // 🔹 Garante que o índice não ultrapasse o número de páginas
+    if (_selectedIndex >= paginas.length) _selectedIndex = 0;
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('${titulos[_selectedIndex]} - ${widget.usuarioLogado}'),
+        title: Text(titulos[_selectedIndex]),
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),
@@ -82,11 +117,7 @@ class _HomePageState extends State<HomePage> {
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         onTap: (index) => setState(() => _selectedIndex = index),
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.dashboard), label: 'Painel'),
-          BottomNavigationBarItem(icon: Icon(Icons.history), label: 'Histórico'),
-          BottomNavigationBarItem(icon: Icon(Icons.file_download), label: 'Exportar'),
-        ],
+        items: itens,
       ),
     );
   }
