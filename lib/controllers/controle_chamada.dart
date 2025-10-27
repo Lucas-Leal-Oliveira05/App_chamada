@@ -1,17 +1,18 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
+import 'package:hive/hive.dart';
 import '../models/chamada.dart';
 import '../services/exporta.dart';
 
-class ChamadaController extends ChangeNotifier { // ✅ agora é um ChangeNotifier
-  // 🔹 Singleton
+class ChamadaController extends ChangeNotifier {
   static final ChamadaController _instancia = ChamadaController._interno();
   factory ChamadaController() => _instancia;
-
   ChamadaController._interno() {
     _iniciarVerificacao();
+    _carregarChamadasSalvas();
   }
 
+  final Duration duracaoChamada = const Duration(minutes: 5);
   final List<DateTime> horarios = [
     DateTime.now().add(const Duration(seconds: 10)),
     DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day, 19, 50),
@@ -19,12 +20,23 @@ class ChamadaController extends ChangeNotifier { // ✅ agora é um ChangeNotifi
     DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day, 21, 30),
   ];
 
-  final Duration duracaoChamada = const Duration(minutes: 5);
   final List<Chamada> historico = [];
-
-  Timer? _timer;
   Chamada? chamadaAtual;
+  Timer? _timer;
   final _exportService = ExportService();
+
+  Future<void> _carregarChamadasSalvas() async {
+    final box = Hive.box<Chamada>('chamadas');
+    historico.clear();
+    historico.addAll(box.values);
+    notifyListeners();
+  }
+
+  Future<void> _salvarChamadas() async {
+    final box = Hive.box<Chamada>('chamadas');
+    await box.clear();
+    await box.addAll(historico);
+  }
 
   void _iniciarVerificacao() {
     _timer?.cancel();
@@ -59,18 +71,21 @@ class ChamadaController extends ChangeNotifier { // ✅ agora é um ChangeNotifi
       aberta: true,
     );
     historico.add(chamadaAtual!);
-    notifyListeners(); // ✅ avisa a interface
+    _salvarChamadas();
+    notifyListeners();
   }
 
   void _fecharChamada() {
     chamadaAtual!.aberta = false;
-    notifyListeners(); // ✅ atualiza interface
+    _salvarChamadas();
+    notifyListeners();
   }
 
   void registrarPresenca(String aluno) {
     if (chamadaAtual != null && chamadaAtual!.aberta) {
       chamadaAtual!.presencas.add(aluno);
-      notifyListeners(); // ✅ notifica quando alguém marca presença
+      _salvarChamadas();
+      notifyListeners();
     }
   }
 
