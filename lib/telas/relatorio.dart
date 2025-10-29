@@ -14,7 +14,7 @@ class ExportPage extends StatelessWidget {
         onPressed: () async {
           final path = await controller.exportarCSV();
           ScaffoldMessenger.of(context)
-              .showSnackBar(SnackBar(content: Text('Exportado para: $path')));
+              .showSnackBar(SnackBar(content: Text('Arquivo em: $path')));
         },
       ),
     );

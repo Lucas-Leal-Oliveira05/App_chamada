@@ -20,7 +20,7 @@ class _PresencaPageState extends State<PresencaPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Registrar Presença'),
+        title: const Text('Presença'),
         centerTitle: true,
       ),
       body: Center(
@@ -31,8 +31,8 @@ class _PresencaPageState extends State<PresencaPage> {
             children: [
               const SizedBox(height: 40),
               SizedBox(
-                width: double.infinity, // ocupa toda a largura
-                height: 80, // aumenta a altura
+                width: double.infinity,
+                height: 80,
                 child: ElevatedButton.icon(
                   label: const Text(
                     'Registrar Presença',
@@ -51,8 +51,7 @@ class _PresencaPageState extends State<PresencaPage> {
                   ),
                   onPressed: () {
                     final chamada = widget.controller.chamadaAtual;
-
-                    // ✅ Verifica se há chamada aberta
+                    //verifica se tem chamada aberta
                     if (chamada == null || !chamada.aberta) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
@@ -63,7 +62,7 @@ class _PresencaPageState extends State<PresencaPage> {
                       return;
                     }
 
-                    // ✅ Verifica se o aluno já registrou presença
+                    //verifica se ja tem presenca
                     if (chamada.presencas.contains(widget.usuarioLogado)) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
@@ -74,7 +73,7 @@ class _PresencaPageState extends State<PresencaPage> {
                       return;
                     }
 
-                    // ✅ Registra presença do usuário logado
+                    //faz o registro
                     widget.controller.registrarPresenca(widget.usuarioLogado);
 
                     ScaffoldMessenger.of(context).showSnackBar(

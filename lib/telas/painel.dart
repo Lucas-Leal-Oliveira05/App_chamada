@@ -7,7 +7,7 @@ import 'presenca.dart';
 class PainelStatusPage extends StatefulWidget {
   final ChamadaController controller;
   final String usuarioLogado;
-  final bool professor; // ✅ tipo de conta (true = professor)
+  final bool professor;
 
   const PainelStatusPage({
     super.key,
@@ -21,20 +21,19 @@ class PainelStatusPage extends StatefulWidget {
 }
 
 class _PainelStatusPageState extends State<PainelStatusPage> {
-  late Timer _timer;
+  late Timer timer;
 
   @override
   void initState() {
     super.initState();
-    // Atualiza o painel automaticamente a cada 10s
-    _timer = Timer.periodic(const Duration(seconds: 10), (_) {
+    timer = Timer.periodic(const Duration(seconds: 10), (_) {
       setState(() {});
     });
   }
 
   @override
   void dispose() {
-    _timer.cancel();
+    timer.cancel();
     super.dispose();
   }
 
@@ -53,7 +52,7 @@ class _PainelStatusPageState extends State<PainelStatusPage> {
       case 'Em andamento':
         return Colors.orange;
       case 'Encerrada':
-        return Colors.green;
+        return Colors.red;
       default:
         return Colors.grey;
     }
@@ -94,12 +93,11 @@ class _PainelStatusPageState extends State<PainelStatusPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Cabeçalho
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'Chamada das $horaFormatada',
+                      'Horário da chamada: $horaFormatada',
                       style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -124,8 +122,6 @@ class _PainelStatusPageState extends State<PainelStatusPage> {
                     ),
                   ],
                 ),
-
-                // Expansão suave quando a chamada está aberta
                 AnimatedCrossFade(
                   duration: const Duration(milliseconds: 400),
                   crossFadeState: emAndamento
@@ -142,8 +138,7 @@ class _PainelStatusPageState extends State<PainelStatusPage> {
                           style: TextStyle(fontSize: 14),
                         ),
                         const SizedBox(height: 12),
-
-                        // ✅ Só exibe o botão se NÃO for professor
+                        //não mostra pros professores
                         if (!widget.professor)
                           ElevatedButton.icon(
                             icon: const Icon(Icons.how_to_reg),

@@ -3,11 +3,11 @@ import '../controllers/controle_chamada.dart';
 import 'painel.dart';
 import 'historico.dart';
 import 'relatorio.dart';
-import 'login.dart'; // importa a tela de login
+import 'login.dart';
 
 class HomePage extends StatefulWidget {
   final String usuarioLogado;
-  final String tipo; // 'aluno' ou 'professor'
+  final String tipo;
 
   const HomePage({
     super.key,
@@ -56,10 +56,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    // 🔹 Verifica se é professor
     final bool isProfessor = widget.tipo == 'professor';
-
-    // 🔹 Define páginas conforme o tipo
     final paginas = isProfessor
         ? [
             HistoricoPage(controller: controller),
@@ -69,13 +66,12 @@ class _HomePageState extends State<HomePage> {
             PainelStatusPage(
               controller: controller,
               usuarioLogado: widget.usuarioLogado,
-              professor: false, // aluno
+              professor: false,
             ),
             HistoricoPage(controller: controller),
             ExportPage(controller: controller),
           ];
 
-    // 🔹 Define títulos e itens do menu
     final titulos = isProfessor
         ? ['Histórico', 'Exportar']
         : ['Painel', 'Histórico', 'Exportar'];
@@ -96,7 +92,6 @@ class _HomePageState extends State<HomePage> {
                 icon: Icon(Icons.file_download), label: 'Exportar'),
           ];
 
-    // 🔹 Garante que o índice não ultrapasse o número de páginas
     if (_selectedIndex >= paginas.length) _selectedIndex = 0;
 
     return Scaffold(

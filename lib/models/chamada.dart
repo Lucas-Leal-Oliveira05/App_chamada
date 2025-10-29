@@ -1,6 +1,6 @@
 import 'package:hive/hive.dart';
 
-part 'chamada.g.dart'; // arquivo gerado automaticamente
+part 'chamada.g.dart';
 
 @HiveType(typeId: 0)
 class Chamada extends HiveObject {

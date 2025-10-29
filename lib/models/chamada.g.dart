@@ -5,6 +5,7 @@ part of 'chamada.dart';
 // **************************************************************************
 // TypeAdapterGenerator
 // **************************************************************************
+//arquivo gerado automaticamente através de comando (hive)
 
 class ChamadaAdapter extends TypeAdapter<Chamada> {
   @override

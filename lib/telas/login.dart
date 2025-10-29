@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'home.dart'; // certifique-se de que o caminho está correto
+import 'home.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -16,7 +16,6 @@ class _LoginPageState extends State<LoginPage> {
   bool _loading = false;
   String? _errorMessage;
 
-  // Contas simuladas: usuário -> { senha, tipo }
   final Map<String, Map<String, String>> contas = {
     'aluno': {'senha': '1234', 'tipo': 'aluno'},
     'maria': {'senha': '1234', 'tipo': 'professor'},
@@ -34,11 +33,11 @@ class _LoginPageState extends State<LoginPage> {
     final usuario = _userController.text.trim();
     final senha = _passController.text;
 
-    // Verifica se o usuário existe
+    //verificacao do login
     if (contas.containsKey(usuario)) {
-      final userData = contas[usuario]!; // Mapa com senha e tipo
+      final userData = contas[usuario]!; 
       if (userData['senha'] == senha) {
-        final tipo = userData['tipo']!; // "aluno" ou "professor"
+        final tipo = userData['tipo']!;
 
         if (!mounted) return;
 
@@ -54,8 +53,6 @@ class _LoginPageState extends State<LoginPage> {
         return;
       }
     }
-
-    // Se chegou aqui, login falhou
     setState(() {
       _loading = false;
       _errorMessage = 'Usuário ou senha inválidos';
@@ -98,8 +95,6 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     ),
                     const SizedBox(height: 24),
-
-                    // Usuário
                     TextFormField(
                       controller: _userController,
                       decoration: const InputDecoration(
@@ -110,8 +105,6 @@ class _LoginPageState extends State<LoginPage> {
                           value == null || value.isEmpty ? 'Informe o usuário' : null,
                     ),
                     const SizedBox(height: 16),
-
-                    // Senha
                     TextFormField(
                       controller: _passController,
                       obscureText: _obscure,

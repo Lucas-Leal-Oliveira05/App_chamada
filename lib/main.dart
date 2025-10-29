@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'models/chamada.dart';
-import 'telas/login.dart'; // importa a tela de login
+import 'telas/login.dart';
 
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
@@ -18,12 +18,12 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Sistema de Chamada',
+      title: 'App chamada',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.indigo,
       ),
-      home: const LoginPage(), // ✅ App começa na tela de login
+      home: const LoginPage(),
     );
   }
 }

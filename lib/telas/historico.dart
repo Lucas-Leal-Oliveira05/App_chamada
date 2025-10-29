@@ -17,7 +17,7 @@ class HistoricoPage extends StatelessWidget {
         if (controller.historico.isEmpty) {
           return const Center(
             child: Text(
-              'Nenhuma chamada registrada ainda.',
+              'Nenhuma chamada registrada',
               style: TextStyle(fontSize: 16),
             ),
           );
@@ -39,7 +39,7 @@ class HistoricoPage extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12),
               ),
               child: ExpansionTile(
-                title: Text('Chamada do dia $dia',
+                title: Text('Chamada dia: $dia',
                     style: const TextStyle(fontWeight: FontWeight.bold)),
                 subtitle: Text('Horário: $inicio - $fim'),
                 leading: Icon(
@@ -62,7 +62,7 @@ class HistoricoPage extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                   if (chamada.presencas.isEmpty)
-                    const Text('Nenhum aluno presente ainda.')
+                    const Text('Sem presenças por enquanto')
                   else
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,

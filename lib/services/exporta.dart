@@ -4,6 +4,8 @@ import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import '../models/chamada.dart';
 
+// não está funcional (não como deveria)
+
 class ExportService {
   Future<String> gerarCSV(List<Chamada> historico) async {
     List<List<String>> rows = [
