@@ -1,0 +1,15 @@
+import 'package:flutter/services.dart';
+
+class UptimeService {
+  static const MethodChannel _channel = MethodChannel('uptime_channel');
+
+  /// Retorna o tempo em milissegundos desde o último boot
+  static Future<int> getUptimeMillis() async {
+    try {
+      final int uptime = await _channel.invokeMethod('getUptime');
+      return uptime;
+    } catch (e) {
+      return 0; // fallback
+    }
+  }
+}
