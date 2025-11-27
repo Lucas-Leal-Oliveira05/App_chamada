@@ -1,57 +1,86 @@
 import 'dart:async';
 import 'dart:math';
+import 'package:flutter/services.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:sensors_plus/sensors_plus.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 
 class SegurancaService {
-  final DateTime appStart = DateTime.now();  
+  final DateTime appStart = DateTime.now();
+  static const MethodChannel _channel = MethodChannel("uptime_channel");
   // -----------------------------------------
   // 1) GEOLOCALIZAÇÃO
   // -----------------------------------------
   Future<bool> verificarLocalizacao() async {
-    const double raioPermitido = 150; // metros
-    const double faculLat = -26.304444; // coloque sua lat real
-    const double faculLng = -48.850277; // coloque sua long real
+    print("🔍 [GPS] Iniciando verificação de localização...");
+
+    const double raioPermitido = 150; 
+    const double faculLat = -26.304444;
+    const double faculLng = -48.850277;
 
     bool servicoAtivado = await Geolocator.isLocationServiceEnabled();
-    if (!servicoAtivado) return false;
+    print("📡 [GPS] Serviço de localização ativo: $servicoAtivado");
+    if (!servicoAtivado) {
+      print("❌ [GPS] Serviço de localização desativado.");
+      return false;
+    }
 
     LocationPermission perm = await Geolocator.checkPermission();
+    print("📡 [GPS] Permissão atual: $perm");
+
     if (perm == LocationPermission.denied) {
       perm = await Geolocator.requestPermission();
-      if (perm == LocationPermission.denied) return false;
+      print("📡 [GPS] Permissão requisitada: $perm");
+
+      if (perm == LocationPermission.denied) {
+        print("❌ [GPS] Permissão negada.");
+        return false;
+      }
     }
 
     final pos = await Geolocator.getCurrentPosition();
+    print("📍 [GPS] Posição atual: lat=${pos.latitude}, lng=${pos.longitude}");
 
     double dist = Geolocator.distanceBetween(
       faculLat, faculLng,
       pos.latitude, pos.longitude,
     );
 
-    return dist <= raioPermitido;
+    print("📏 [GPS] Distância até campus: ${dist.toStringAsFixed(2)} metros");
+
+    bool dentro = dist <= raioPermitido;
+    print("🏁 [GPS] Dentro do limite? $dentro");
+
+    return dentro;
   }
 
   // -----------------------------------------
   // 2) SENSORES - ACELERÔMETRO
   // -----------------------------------------
   Future<bool> verificarSensores() async {
+    print("🔍 [SENSORES] Iniciando verificação...");
+
     final List<double> amostras = [];
 
     final sub = accelerometerEvents.listen((event) {
-      double modulo = sqrt(event.x * event.x + event.y * event.y + event.z * event.z);
+      double modulo =
+          sqrt(event.x * event.x + event.y * event.y + event.z * event.z);
+
       amostras.add(modulo);
     });
 
-    // captura por 1 segundo
     await Future.delayed(const Duration(seconds: 1));
     await sub.cancel();
 
-    if (amostras.length < 5) return false;
+    print("📊 [SENSORES] Amostras capturadas: ${amostras.length}");
 
-    // calcular desvio padrão
+    if (amostras.length < 5) {
+      print("❌ [SENSORES] Poucas amostras — suspeito.");
+      return false;
+    }
+
     double media = amostras.reduce((a, b) => a + b) / amostras.length;
+    print("📊 [SENSORES] Média: ${media.toStringAsFixed(4)}");
 
     double soma = 0;
     for (final v in amostras) {
@@ -60,23 +89,37 @@ class SegurancaService {
 
     double desvio = sqrt(soma / amostras.length);
 
-    // Se desvio muito baixo → suspeito (robótico)
-    return desvio > 0.03; // valor ajustável
+    print("📉 [SENSORES] Desvio padrão: ${desvio.toStringAsFixed(4)}");
+
+    bool valido = desvio > 0.03;
+    print("🏁 [SENSORES] Movimento real detectado? $valido");
+
+    return valido;
   }
 
-  // -----------------------------------------
-  // 3) HORÁRIO / UPTIME
-  // -----------------------------------------
   // -----------------------------------------
   // 3) HORÁRIO / UPTIME SIMULADO
   // -----------------------------------------
   Future<bool> verificarHorario() async {
-    final agora = DateTime.now();
+    print("🔍 [HORÁRIO] Verificando manipulação de horário...");
 
-    // tempo desde o app iniciar
-    final tempoDesdeBoot = agora.difference(appStart).inMilliseconds;
+    int uptimeMs = 0;
 
-    // se o app foi reiniciado recentemente (<5 min), suspeito
-    return tempoDesdeBoot > 5 * 60 * 1000; // 5 minutos
+    try {
+      uptimeMs = await _channel.invokeMethod<int>("getUptime") ?? 0;
+    } catch (e) {
+      print("⚠️ Erro ao obter uptime: $e");
+      return true;
+    }
+
+    print("⏱ uptime real desde o boot: $uptimeMs ms");
+
+    // Regras
+    bool valido = uptimeMs > 5 * 60 * 1000;
+
+    print("🏁 Uptime > 5 min? $valido");
+
+    return valido;
   }
+
 }
