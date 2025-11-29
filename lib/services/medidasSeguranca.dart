@@ -3,7 +3,6 @@ import 'dart:math';
 import 'package:flutter/services.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:sensors_plus/sensors_plus.dart';
-import 'package:device_info_plus/device_info_plus.dart';
 
 class SegurancaService {
   final DateTime appStart = DateTime.now();

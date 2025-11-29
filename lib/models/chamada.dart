@@ -1,25 +1,38 @@
-import 'package:hive/hive.dart';
-
-part 'chamada.g.dart';
-
-@HiveType(typeId: 0)
-class Chamada extends HiveObject {
-  @HiveField(0)
+class Chamada {
+  int? id;
   DateTime horaInicio;
-
-  @HiveField(1)
   DateTime horaFim;
-
-  @HiveField(2)
+  DateTime data;
   bool aberta;
-
-  @HiveField(3)
   List<String> presencas;
 
   Chamada({
+    this.id,
     required this.horaInicio,
     required this.horaFim,
-    this.aberta = true,
+    required this.data,
+    required this.aberta,
     List<String>? presencas,
   }) : presencas = presencas ?? [];
+
+  factory Chamada.fromJson(Map<String, dynamic> map) {
+    return Chamada(
+      id: map['id'] is int ? map['id'] : int.tryParse(map['id'].toString()),
+      horaInicio: DateTime.parse(map['hora_inicio']),
+      horaFim: DateTime.parse(map['hora_fim']),
+      data: DateTime.parse(map['data']),
+      aberta: map['aberta'],
+      presencas: List<String>.from(map['presencas'] ?? []),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      "hora_inicio": horaInicio.toIso8601String(),
+      "hora_fim": horaFim.toIso8601String(),
+      "data": data.toIso8601String().substring(0, 10),
+      "aberta": aberta,
+      "presencas": presencas,
+    };
+  }
 }

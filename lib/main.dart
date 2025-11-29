@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:hive_flutter/hive_flutter.dart';
-import 'models/chamada.dart';
+import 'supabase_config.dart';
 import 'telas/login.dart';
 
-void main() async{
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Hive.initFlutter();
-  Hive.registerAdapter(ChamadaAdapter());
-  await Hive.openBox<Chamada>('chamadas');
+  await SupabaseConfig.init();
+  final test = await Supabase.instance.client.from('chamadas').select().limit(1);
+  print("TESTE SUPABASE => $test");
+
 
   runApp(const MyApp());
 }
@@ -18,7 +18,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'App chamada',
+      title: 'App Chamada',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.indigo,

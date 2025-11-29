@@ -1,18 +1,23 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
-import 'package:hive/hive.dart';
+import 'package:collection/collection.dart';
 import '../models/chamada.dart';
+import '../services/chamada_service.dart';
 import '../services/exporta.dart';
 
 class ChamadaController extends ChangeNotifier {
+  final _service = ChamadaService();
+
   static final ChamadaController _instancia = ChamadaController._interno();
   factory ChamadaController() => _instancia;
+
   ChamadaController._interno() {
     _iniciarVerificacao();
-    _carregarChamadasSalvas();
+    _carregarChamadas();
   }
 
   final Duration duracaoChamada = const Duration(minutes: 5);
+
   final List<DateTime> horarios = [
     DateTime.now().add(const Duration(seconds: 10)),
     DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day, 19, 50),
@@ -25,66 +30,75 @@ class ChamadaController extends ChangeNotifier {
   Timer? _timer;
   final _exportService = ExportService();
 
-  Future<void> _carregarChamadasSalvas() async {
-    final box = Hive.box<Chamada>('chamadas');
+  Future<void> _carregarChamadas() async {
     historico.clear();
-    historico.addAll(box.values);
-    notifyListeners();
-  }
+    historico.addAll(await _service.listarChamadas());
 
-  Future<void> _salvarChamadas() async {
-    final box = Hive.box<Chamada>('chamadas');
-    await box.clear();
-    await box.addAll(historico);
+    chamadaAtual = historico.where((c) => c.aberta).cast<Chamada?>().firstOrNull;
+    
+    notifyListeners();
   }
 
   void _iniciarVerificacao() {
     _timer?.cancel();
-    _timer = Timer.periodic(const Duration(seconds: 5), (_) => _verificarChamadas());
+    _timer = Timer.periodic(
+      const Duration(seconds: 5),
+      (_) => _verificarChamadas(),
+    );
   }
 
-  void _verificarChamadas() {
-    final agora = DateTime.now();
-    for (final h in horarios) {
-      if (agora.hour == h.hour &&
-          agora.minute >= h.minute &&
-          agora.isBefore(h.add(duracaoChamada))) {
-        if (chamadaAtual == null || !chamadaAtual!.aberta) {
-          _abrirChamada(h);
-        }
-        return;
-      }
-    }
+void _verificarChamadas() {
+  final agora = DateTime.now();
 
-    if (chamadaAtual != null && chamadaAtual!.aberta) {
-      final fim = chamadaAtual!.horaInicio.add(duracaoChamada);
-      if (agora.isAfter(fim)) {
-        _fecharChamada();
+  for (final h in horarios) {
+    final inicio = h;
+    final fim = h.add(duracaoChamada);
+
+    if ((agora.isAtSameMomentAs(inicio) || agora.isAfter(inicio)) &&
+        agora.isBefore(fim)) {
+      if (chamadaAtual == null || !chamadaAtual!.aberta) {
+        _abrirChamada(h);
       }
+      return;
     }
   }
 
-  void _abrirChamada(DateTime horario) {
-    chamadaAtual = Chamada(
+  if (chamadaAtual != null && chamadaAtual!.aberta) {
+    final fim = chamadaAtual!.horaInicio.add(duracaoChamada);
+    if (agora.isAfter(fim)) {
+      _fecharChamada();
+    }
+  }
+}
+
+
+  Future<void> _abrirChamada(DateTime horario) async {
+    final nova = Chamada(
       horaInicio: horario,
       horaFim: horario.add(duracaoChamada),
+      data: DateTime.now(),
       aberta: true,
+      presencas: [],
     );
-    historico.add(chamadaAtual!);
-    _salvarChamadas();
+
+    final criada = await _service.criarChamada(nova);
+
+    chamadaAtual = criada;
+    historico.add(criada);
+
     notifyListeners();
   }
 
-  void _fecharChamada() {
+  Future<void> _fecharChamada() async {
     chamadaAtual!.aberta = false;
-    _salvarChamadas();
+    await _service.atualizarChamada(chamadaAtual!);
     notifyListeners();
   }
 
-  void registrarPresenca(String aluno) {
+  Future<void> registrarPresenca(String aluno) async {
     if (chamadaAtual != null && chamadaAtual!.aberta) {
       chamadaAtual!.presencas.add(aluno);
-      _salvarChamadas();
+      await _service.atualizarChamada(chamadaAtual!);
       notifyListeners();
     }
   }
