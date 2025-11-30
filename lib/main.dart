@@ -1,13 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'supabase_config.dart';
 import 'telas/login.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await SupabaseConfig.init();
-  final test = await Supabase.instance.client.from('chamadas').select().limit(1);
-  print("TESTE SUPABASE => $test");
 
+
+   final test = await Supabase.instance.client
+      .from('chamadas')
+      .select()
+      .limit(1);
+
+  print("TESTE SUPABASE => $test");
 
   runApp(const MyApp());
 }
