@@ -14,7 +14,7 @@ class SegurancaService {
     print("🔍 [GPS] Iniciando verificação de localização...");
 
     const double raioPermitido = 150; 
-    const double faculLat = -26.304444;
+    const double faculLat = -26.304444;  
     const double faculLng = -48.850277;
 
     bool servicoAtivado = await Geolocator.isLocationServiceEnabled();
@@ -56,7 +56,8 @@ class SegurancaService {
   // -----------------------------------------
   // 2) SENSORES - ACELERÔMETRO
   // -----------------------------------------
-  Future<bool> verificarSensores() async {
+  
+   Future<bool> verificarSensores() async {
     print("🔍 [SENSORES] Iniciando verificação...");
 
     final List<double> amostras = [];

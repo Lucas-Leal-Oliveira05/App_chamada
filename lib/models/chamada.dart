@@ -1,5 +1,5 @@
 class Chamada {
-  int? id;
+  String? id;
   DateTime horaInicio;
   DateTime horaFim;
   DateTime data;
@@ -17,7 +17,7 @@ class Chamada {
 
   factory Chamada.fromJson(Map<String, dynamic> map) {
     return Chamada(
-      id: map['id'] is int ? map['id'] : int.tryParse(map['id'].toString()),
+      id: map['id'],
       horaInicio: DateTime.parse(map['hora_inicio']),
       horaFim: DateTime.parse(map['hora_fim']),
       data: DateTime.parse(map['data']),
@@ -30,7 +30,7 @@ class Chamada {
     return {
       "hora_inicio": horaInicio.toIso8601String(),
       "hora_fim": horaFim.toIso8601String(),
-      "data": data.toIso8601String().substring(0, 10),
+      "data": data.toIso8601String(),
       "aberta": aberta,
       "presencas": presencas,
     };

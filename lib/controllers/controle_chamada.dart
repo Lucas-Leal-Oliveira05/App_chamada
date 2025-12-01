@@ -4,10 +4,11 @@ import 'package:collection/collection.dart';
 import '../models/chamada.dart';
 import '../services/chamada_service.dart';
 import '../services/exporta.dart';
+import '../services/presenca_service.dart';
 
 class ChamadaController extends ChangeNotifier {
   final _service = ChamadaService();
-
+  final _presencaService = PresencaService();
   static final ChamadaController _instancia = ChamadaController._interno();
   factory ChamadaController() => _instancia;
 
@@ -103,13 +104,16 @@ void _verificarChamadas() {
     notifyListeners();
   }
 
-  Future<void> registrarPresenca(String aluno) async {
-    if (chamadaAtual != null && chamadaAtual!.aberta) {
-      chamadaAtual!.presencas.add(aluno);
-      await _service.atualizarChamada(chamadaAtual!);
-      notifyListeners();
-    }
+Future<void> registrarPresenca(String aluno) async {
+  if (chamadaAtual != null && chamadaAtual!.aberta) {
+await _presencaService.registrarPresenca(chamadaAtual!.id!.toString(), aluno);
+
+    // Adiciona localmente também
+    chamadaAtual!.presencas.add(aluno);
+
+    notifyListeners();
   }
+}
 
   Future<String> exportarCSV() async {
     return await _exportService.gerarCSV(historico);
