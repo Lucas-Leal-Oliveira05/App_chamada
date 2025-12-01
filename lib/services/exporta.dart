@@ -2,30 +2,38 @@ import 'dart:io';
 import 'package:csv/csv.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
-import '../models/chamada.dart';
-
-// não está funcional (não como deveria)
 
 class ExportService {
-  Future<String> gerarCSV(List<Chamada> historico) async {
+  Future<String> gerarCSV(List historico) async {
+    // 1. Montar o CSV
+    final dateFormatter = DateFormat('dd/MM/yyyy');
+    final timeFormatter = DateFormat('HH:mm');
+
     List<List<String>> rows = [
-      ['Data', 'Início', 'Fim', 'Presenças']
+      ['Chamada', 'Dia', 'Horário', 'Presenças']
     ];
 
     for (var c in historico) {
       rows.add([
-        DateFormat('dd/MM/yyyy').format(c.horaInicio),
-        DateFormat('HH:mm').format(c.horaInicio),
-        DateFormat('HH:mm').format(c.horaFim),
-        c.presencas.join(', ')
+        c.id?.toString() ?? '—',
+        dateFormatter.format(c.horaInicio),
+        '${timeFormatter.format(c.horaInicio)} - ${timeFormatter.format(c.horaFim)}',
+        c.presencas.isEmpty ? 'Nenhuma' : c.presencas.join(', ')
       ]);
     }
 
-    String csv = const ListToCsvConverter().convert(rows);
-    final dir = await getApplicationDocumentsDirectory();
-    final path = '${dir.path}/chamadas.csv';
-    final file = File(path);
+    final csv = const ListToCsvConverter().convert(rows);
+
+    // 2. Pasta correta para salvamento (Android 13+)
+    final dir = await getExternalStorageDirectories(type: StorageDirectory.downloads);
+
+    final downloadsDir = dir!.first;
+
+    final file = File('${downloadsDir.path}/chamadas.csv');
+
+    // 3. Escrever arquivo
     await file.writeAsString(csv);
-    return path;
+
+    return file.path;
   }
 }

@@ -20,11 +20,19 @@ class ChamadaController extends ChangeNotifier {
 
   final List<DateTime> horarios = [
     DateTime.now().add(const Duration(seconds: 10)),
+    DateTime.now().add(const Duration(seconds: 30)),
+    DateTime.now().add(const Duration(seconds: 45)),
+    DateTime.now().add(const Duration(seconds: 60)),
+  ];
+
+/*
+  final List<DateTime> horarios = [
+    DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day, 19, 00),
     DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day, 19, 50),
     DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day, 20, 40),
     DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day, 21, 30),
   ];
-
+*/
   final List<Chamada> historico = [];
   Chamada? chamadaAtual;
   Timer? _timer;
