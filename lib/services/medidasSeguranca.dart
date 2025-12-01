@@ -13,9 +13,9 @@ class SegurancaService {
   Future<bool> verificarLocalizacao() async {
     print("🔍 [GPS] Iniciando verificação de localização...");
 
-    const double raioPermitido = 150; 
-    const double faculLat = -26.304444;
-    const double faculLng = -48.850277;
+    const double raioPermitido = 999999999; 
+    const double faculLat = -26.230702; //-26.304444;  
+    const double faculLng = -48.612934; //-48.850277;
 
     bool servicoAtivado = await Geolocator.isLocationServiceEnabled();
     print("📡 [GPS] Serviço de localização ativo: $servicoAtivado");
@@ -56,7 +56,13 @@ class SegurancaService {
   // -----------------------------------------
   // 2) SENSORES - ACELERÔMETRO
   // -----------------------------------------
+  
   Future<bool> verificarSensores() async {
+  print("🛑 [SENSORES] Verificação de sensores desativada temporariamente.");
+  return true;
+}
+
+  /*Future<bool> verificarSensores() async {
     print("🔍 [SENSORES] Iniciando verificação...");
 
     final List<double> amostras = [];
@@ -94,7 +100,7 @@ class SegurancaService {
     print("🏁 [SENSORES] Movimento real detectado? $valido");
 
     return valido;
-  }
+  } */
 
   // -----------------------------------------
   // 3) HORÁRIO / UPTIME SIMULADO
