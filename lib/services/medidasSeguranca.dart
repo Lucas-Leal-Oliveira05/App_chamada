@@ -13,7 +13,7 @@ class SegurancaService {
   Future<bool> verificarLocalizacao() async {
     print("🔍 [GPS] Iniciando verificação de localização...");
 
-    const double raioPermitido = 999999999; 
+    const double raioPermitido = 150; 
     const double faculLat = -26.304444;  
     const double faculLng = -48.850277;
 
