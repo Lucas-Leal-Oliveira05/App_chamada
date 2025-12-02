@@ -17,13 +17,13 @@ class ChamadaController extends ChangeNotifier {
     _carregarChamadas();
   }
 
-  final Duration duracaoChamada = const Duration(minutes: 5);
+  final Duration duracaoChamada = const Duration(minutes: 1);
 
   final List<DateTime> horarios = [
     DateTime.now().add(const Duration(seconds: 10)),
-    DateTime.now().add(const Duration(seconds: 30)),
-    DateTime.now().add(const Duration(seconds: 45)),
-    DateTime.now().add(const Duration(seconds: 60)),
+    DateTime.now().add(const Duration(seconds: 71)),
+    DateTime.now().add(const Duration(seconds: 132)),
+    DateTime.now().add(const Duration(seconds: 193)),
   ];
 
 /*
@@ -108,7 +108,7 @@ Future<void> registrarPresenca(String aluno) async {
   if (chamadaAtual != null && chamadaAtual!.aberta) {
 await _presencaService.registrarPresenca(chamadaAtual!.id!.toString(), aluno);
 
-    // Adiciona localmente também
+    // Adiciona localmente
     chamadaAtual!.presencas.add(aluno);
 
     notifyListeners();

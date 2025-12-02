@@ -21,24 +21,22 @@ class _PresencaPageState extends State<PresencaPage> {
   bool carregando = false;
 
   Future<bool> verificarTudo() async {
-    // 🔹 Checagem de GPS
+    //Checagem de GPS
     bool posicaoOk = await seg.verificarLocalizacao();
     if (!posicaoOk) {
-      _msg("Você não está dentro do campus.");
+      _msg("Você não está dentro da faculdade");
       return false;
     }
-
-    // 🔹 Checagem de sensores
+    //Checagem de sensores
     bool sensoresOk = await seg.verificarSensores();
     if (!sensoresOk) {
-      _msg("Falha nos sensores — possível dispositivo emulado.");
+      _msg("Falha nos sensores; dispositivo emulado");
       return false;
     }
-
-    // 🔹 Checagem de tempo desde o boot
+    //Checagem de boot/uptime
     bool horarioOk = await seg.verificarHorario();
     if (!horarioOk) {
-      _msg("Horário do sistema suspeito — reinício recente detectado.");
+      _msg("Horário do sistema suspeito — reinício recente");
       return false;
     }
 

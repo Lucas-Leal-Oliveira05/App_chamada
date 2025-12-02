@@ -5,27 +5,32 @@ class ChamadaService {
   final supabase = Supabase.instance.client;
 
   Future<List<Chamada>> listarChamadas() async {
-    // 1. Buscar todas as chamadas
     final res = await supabase
         .from('chamadas')
-        .select()
+        .select('''
+          id,
+          hora_inicio,
+          hora_fim,
+          aberta,
+          data,
+          presencas:presencas(id, aluno)
+        ''')
         .order('hora_inicio');
 
-    final chamadas = (res as List).map((e) => Chamada.fromJson(e)).toList();
+    // Converte chamadas + presenças do banco
+    return (res as List).map((map) {
+      final chamada = Chamada.fromJson(map);
 
-    // 2. Buscar as presenças para cada chamada
-    for (final chamada in chamadas) {
-      final presencasRes = await supabase
-          .from('presencas')
-          .select()
-          .eq('id_chamada', chamada.id!);
+      // Ajusta lista de presenças (tabela separada)
+      if (map['presencas'] != null) {
+        chamada.presencas =
+            (map['presencas'] as List).map((p) => p['aluno'].toString()).toList();
+      } else {
+        chamada.presencas = [];
+      }
 
-      chamada.presencas = presencasRes
-          .map<String>((p) => p['aluno'].toString())
-          .toList();
-    }
-
-    return chamadas;
+      return chamada;
+    }).toList();
   }
 
   Future<Chamada> criarChamada(Chamada c) async {

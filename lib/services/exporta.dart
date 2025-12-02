@@ -5,12 +5,11 @@ import 'package:path_provider/path_provider.dart';
 
 class ExportService {
   Future<String> gerarCSV(List historico) async {
-    // 1. Montar o CSV
     final dateFormatter = DateFormat('dd/MM/yyyy');
     final timeFormatter = DateFormat('HH:mm');
 
     List<List<String>> rows = [
-      ['Chamada', 'Dia', 'Horário', 'Presenças']
+      ['Chamada', 'Dia', 'Horario', 'Presencas']
     ];
 
     for (var c in historico) {
@@ -22,16 +21,18 @@ class ExportService {
       ]);
     }
 
-    final csv = const ListToCsvConverter().convert(rows);
+    const converter = ListToCsvConverter(
+      fieldDelimiter: ';',
+      textDelimiter: '"',
+      eol: '\n',
+    );
+    final csv = converter.convert(rows);
 
-    // 2. Pasta correta para salvamento (Android 13+)
-    final dir = await getExternalStorageDirectories(type: StorageDirectory.downloads);
-
-    final downloadsDir = dir!.first;
+    final dirs = await getExternalStorageDirectories(type: StorageDirectory.downloads);
+    final downloadsDir = dirs!.first;
 
     final file = File('${downloadsDir.path}/chamadas.csv');
 
-    // 3. Escrever arquivo
     await file.writeAsString(csv);
 
     return file.path;
