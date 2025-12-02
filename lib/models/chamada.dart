@@ -1,5 +1,5 @@
 import 'dart:convert';
-
+import 'package:intl/intl.dart';
 
 class Chamada {
   String? id;
@@ -29,16 +29,15 @@ class Chamada {
     );
   }
 
-  Map<String, dynamic> toJson() {
-    return {
-      "id": id,
-      "hora_inicio": horaInicio.toIso8601String(),
-      "hora_fim": horaFim.toIso8601String(),
-      "data": data.toIso8601String(),
-      "aberta": aberta,
-      "presencas": presencas,
-    };
-  }
+Map<String, dynamic> toJson() {
+  return {
+    "hora_inicio": horaInicio.toIso8601String(),
+    "hora_fim": horaFim.toIso8601String(),
+    "data": DateFormat('yyyy-MM-dd').format(data), // <- SE A COLUNA FOR DATE
+    "aberta": aberta,
+  };
+}
+
 
   /// trata todos os formatos
   static List<String> _extrairPresencas(dynamic valor) {

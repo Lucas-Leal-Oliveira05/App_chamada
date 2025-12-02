@@ -108,7 +108,7 @@ Future<void> registrarPresenca(String aluno) async {
   if (chamadaAtual != null && chamadaAtual!.aberta) {
 await _presencaService.registrarPresenca(chamadaAtual!.id!.toString(), aluno);
 
-    // Adiciona localmente
+    // Adiciona localmente também
     chamadaAtual!.presencas.add(aluno);
 
     notifyListeners();

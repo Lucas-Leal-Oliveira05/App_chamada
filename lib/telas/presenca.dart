@@ -27,19 +27,23 @@ class _PresencaPageState extends State<PresencaPage> {
       _msg("Você não está dentro da faculdade");
       return false;
     }
+/*
     //Checagem de sensores
     bool sensoresOk = await seg.verificarSensores();
     if (!sensoresOk) {
       _msg("Falha nos sensores; dispositivo emulado");
       return false;
     }
+
+*/
+/*
     //Checagem de boot/uptime
     bool horarioOk = await seg.verificarHorario();
     if (!horarioOk) {
       _msg("Horário do sistema suspeito — reinício recente");
       return false;
     }
-
+*/
     return true;
   }
 
