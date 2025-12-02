@@ -16,7 +16,7 @@ class ExportService {
       rows.add([
         c.id?.toString() ?? '—',
         dateFormatter.format(c.horaInicio),
-        '${timeFormatter.format(c.horaInicio)} - ${timeFormatter.format(c.horaFim)}',
+        '${timeFormatter.format(c.horaInicio)}',
         c.presencas.isEmpty ? 'Nenhuma' : c.presencas.join(', ')
       ]);
     }
